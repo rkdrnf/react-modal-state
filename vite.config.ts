@@ -8,11 +8,14 @@ export default defineConfig({
   build: {
     lib: {
       entry: resolve(__dirname, "lib/main.ts"),
-      formats: ["es"],
+      formats: ["es", "cjs"],
     },
     copyPublicDir: false,
     rollupOptions: {
       external: ["react", "react/jsx-runtime"],
+      output: {
+        entryFileNames: "[name].[format].js",
+      },
     },
   },
 });

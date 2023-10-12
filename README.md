@@ -74,6 +74,13 @@ const UserModal = () => {
 };
 ```
 
+# Features
+
+- Very small bundle footprint
+- Allow opening same modal component multiple times simultaneously with routh-path(`new-modal/:id`) like id notation.
+- Allow to write modal component with caller interface ignorant manner.
+- UI Framework independant. Can be used with any UI framework such as MUI or Headless UI
+
 # Backgrounds
 
 There are many awkward and repetitive points when using modals naively and this library tries to solve these problems.
@@ -156,17 +163,13 @@ In the above code, you can see benefits like
 - A component which is responsible to open modal does not need to manage any extra state which is needed in modal. It only calls open (and close if needed)
 - Modal component can access methods and custom properties need to render modal by itself. No need to manage props to provide data, which enables modals to be declared and implemented fully indepenently without worrying about the interface it has to provide to opening components.
 
+# Demo and Development
 
-# Demo and Development 
-
-This is a typical vite project. 
+This is a typical vite project.
 
 ```bash
 npm install
 npm run dev
 ```
+
 to run demo page.
-
-
-
-
