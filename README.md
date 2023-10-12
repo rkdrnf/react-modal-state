@@ -3,7 +3,7 @@
 This is a tiny library that manages modal in react with minimal dependency.
 
 > [!IMPORTANT]  
-> This project is in an early stage. Any issue or feature request would be very helpful to develop this library further!
+> This library is in an early stage. Any issue or feature request would be very helpful to develop this library further!
 
 # Installation
 
