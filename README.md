@@ -80,6 +80,7 @@ const UserModal = () => {
 - Allow opening same modal component multiple times simultaneously with routh-path(`new-modal/:id`) like id notation.
 - Allow to write modal component with caller interface ignorant manner.
 - UI Framework independant. Can be used with any UI framework such as MUI or Headless UI
+- Supports nested modal of the same component using parameterized path(`users/:id`). for example, `users/1` can be opened over `users/2`
 
 # Backgrounds
 
