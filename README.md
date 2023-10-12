@@ -1,4 +1,4 @@
-# React Modal Context
+# React Modal State
 
 This is a tiny library that manages modal in react with minimal dependency.
 
@@ -8,7 +8,7 @@ This is a tiny library that manages modal in react with minimal dependency.
 # Installation
 
 ```bash
-npm i react-modal-context
+npm i react-modal-state
 ```
 
 # Usage
@@ -16,7 +16,7 @@ npm i react-modal-context
 ### Define modals collectively
 
 ```JSX
-import { ModalProvider, ModalRenderer } from "react-modal-context";
+import { ModalProvider, ModalRenderer } from "react-modal-state";
 
 ...
 
@@ -37,7 +37,7 @@ import { ModalProvider, ModalRenderer } from "react-modal-context";
 ### Call from anywhere
 
 ```JSX
-import { useModal } from "react-modal-context";
+import { useModal } from "react-modal-state";
 
 function Content() {
   const { open: openNewUser } = useModal("new-user");
@@ -55,7 +55,7 @@ function Content() {
 ### Declare modal component
 
 ```JSX
-import { useModalInstance } from "react-modal-context";
+import { useModalInstance } from "react-modal-state";
 
 const UserModal = () => {
   const { data, isOpen, close } = useModalInstance<{
