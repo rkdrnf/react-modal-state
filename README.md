@@ -34,7 +34,7 @@ import { ModalProvider, ModalRenderer } from "react-modal-state";
 > [!NOTE]  
 > `<ModalRenderer />` does not have to be the direct child of the `<ModalProvider />`. You can place `<ModalRenderer />` in any node under `<ModalProvider />` component tree if needed.
 
-### Call from anywhere
+### Open from anywhere
 
 ```JSX
 import { useModal } from "react-modal-state";
