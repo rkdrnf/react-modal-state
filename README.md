@@ -85,9 +85,9 @@ const UserModal = () => {
 
 There are many awkward and repetitive points when using modals naively and this library tries to solve these problems.
 
-Typical scenarious are as below.
+Typical scenarios are as below.
 
-- Many modals require extra data to be passed when opening modal. If you starts to manage more and more modals, component state which opens modal soon become very reptitive with declarations of modal state managing its open state and extra data.
+- Many modals require extra data to be passed when opening modal. If you start to manage more and more modals, component state which opens modal soon become very reptitive with declarations of modal state managing its open state and extra data.
 
 - When you need to open a parent modal from a deeply nested component, you typically have choices below.
   - Pass props to open modal down to the child component. which usually causes a problem known as a prop drilling.
