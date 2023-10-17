@@ -13,15 +13,15 @@ npm i react-modal-state
 
 # Usage
 
-### Define modals collectively
+### Place ModalProvider and ModalRenderer
 
 ```JSX
 import { ModalProvider, ModalRenderer } from "react-modal-state";
 
 ...
 
+// Optionally provide modals prop to open modal by id or use self-nested modals
 <ModalProvider modals={[
-        ["new-user", NewUserModal],
         ["users/:id", UserModal],
       ]}
     >
@@ -40,8 +40,10 @@ import { ModalProvider, ModalRenderer } from "react-modal-state";
 import { useModal } from "react-modal-state";
 
 function Content() {
-  const { open: openNewUser } = useModal("new-user");
-  const { open: openUser } = useModal("users/:id");
+  const { open: openNewUser } = useModal(NewUserModal);
+  const { open: openUser } = useModal(UserModal);
+  // or alternatively, you can open modal by id defined in ModalProvider
+  // const { open: openUser } = useModal("users/:id");
 
   return (
     <>

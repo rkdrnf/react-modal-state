@@ -12,9 +12,9 @@ export const ModalRenderer = ({ Component }: { Component: ComponentType }) => {
       {insts.map((inst) => (
         <ModalInstanceProvider
           key={inst.path}
-          path={inst.path}
           data={inst.data}
           isOpen={inst.isOpen}
+          Component={Component}
         >
           <Component />
         </ModalInstanceProvider>

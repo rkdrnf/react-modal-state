@@ -1,4 +1,5 @@
 import {
+  ComponentType,
   FC,
   PropsWithChildren,
   createContext,
@@ -16,8 +17,8 @@ type ModalInstanceProviderValue<T = unknown> = {
 
 type ModalInstanceProviderProps = PropsWithChildren<{
   isOpen: boolean;
-  path: string;
   data?: unknown;
+  Component: ComponentType;
 }>;
 
 const ModalInstanceContext = createContext<ModalInstanceProviderValue | null>(
@@ -26,15 +27,15 @@ const ModalInstanceContext = createContext<ModalInstanceProviderValue | null>(
 
 export const ModalInstanceProvider: FC<ModalInstanceProviderProps> = ({
   children,
-  path,
   data,
   isOpen,
+  Component,
 }) => {
-  const { close: closePath } = useModalInternal();
+  const { close: closeModal } = useModalInternal();
 
   const close = useCallback(() => {
-    closePath(path);
-  }, [closePath, path]);
+    closeModal(Component, data);
+  }, [Component, closeModal, data]);
 
   const value = useMemo(
     () => ({

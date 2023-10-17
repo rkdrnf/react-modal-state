@@ -22,7 +22,7 @@ const UserModal = () => {
     name: string;
   }>();
 
-  const { open: openUser } = useModal(`users/:id`);
+  const { open: openUser } = useModal(UserModal);
 
   return (
     <Dialog open={isOpen} onClose={close}>
@@ -46,8 +46,8 @@ const UserModal = () => {
 };
 
 function Content() {
-  const { open: openNewUser } = useModal("new-user");
-  const { open: openUser } = useModal("users/:id");
+  const { open: openNewUser } = useModal(NewUserModal);
+  const { open: openUser } = useModal(UserModal);
   return (
     <Box>
       <button onClick={() => openNewUser()}>New User</button>
@@ -60,12 +60,7 @@ function Content() {
 
 function App() {
   return (
-    <ModalProvider
-      modals={[
-        ["new-user", NewUserModal],
-        ["users/:id", UserModal],
-      ]}
-    >
+    <ModalProvider modals={[["users/:id", UserModal]]}>
       <Content />
       <ModalRenderer Component={NewUserModal} />
       <ModalRenderer Component={UserModal} />

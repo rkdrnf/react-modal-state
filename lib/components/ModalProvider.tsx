@@ -10,16 +10,42 @@ import {
 } from "react";
 import { produce } from "immer";
 
+const getId = (() => {
+  let currentId = 0;
+  const map = new WeakMap();
+
+  return (object: object) => {
+    if (!map.has(object)) {
+      map.set(object, ++currentId);
+    }
+
+    return map.get(object);
+  };
+})();
+
+function parse(path: string, params?: unknown): string {
+  return path
+    .split("/")
+    .map((p) => {
+      if (!p.startsWith(":")) return p;
+
+      const paramName = p.slice(1);
+
+      return String((params as Record<string, unknown>)?.[paramName]);
+    })
+    .join("/");
+}
+
 const ModalContext = createContext<ModalProviderValue | null>(null);
 
 type ModalProviderValue = {
-  open: (path: string, data: unknown) => void;
-  close: (path: string) => void;
+  open: (pathOrComponent: string | ComponentType, data: unknown) => void;
+  close: (pathOrComponent: string | ComponentType, data: unknown) => void;
   getComponentInstances: (Component: ComponentType) => Instance[];
 };
 
 type ModalProviderProps = PropsWithChildren<{
-  modals: [path: string, Component: ComponentType][];
+  modals?: [path: string, Component: ComponentType][];
 }>;
 
 type Instance = {
@@ -49,24 +75,42 @@ export const ModalProvider: FC<ModalProviderProps> = ({
 
   const routes = useMemo(() => modals.map((m) => m[0]), [modals]);
 
-  const open = useCallback(
-    (path: string, data: unknown) => {
-      const rawPath = matchPath(routes, path);
+  const getPathAndKey = useCallback(
+    (pathOrComponent: string | ComponentType, data: unknown) => {
+      if (typeof pathOrComponent === "string") {
+        const parsedPath = parse(pathOrComponent, data);
+        const rawPath = matchPath(routes, pathOrComponent);
+        const modal = modals.find((m) => m[0] === rawPath);
 
-      if (!rawPath) {
-        console.error(`no registered modal path matched for ${path}`);
-        return;
+        if (!modal) {
+          throw new Error(
+            `no registered modal path matched for ${pathOrComponent}`
+          );
+        }
+
+        return [parsedPath, getId(modal[1])];
+      } else {
+        const modal = modals.find((m) => m[1] === pathOrComponent);
+        const path = modal ? parse(modal[0], data) : "";
+        return [path, getId(pathOrComponent)];
       }
+    },
+    [modals, routes]
+  );
+
+  const open = useCallback(
+    (pathOrComponent: string | ComponentType, data: unknown) => {
+      const [path, componentKey] = getPathAndKey(pathOrComponent, data);
 
       setInstances(
         produce((oldInsts) => {
-          if (!oldInsts[rawPath]) {
-            oldInsts[rawPath] = [];
+          if (!oldInsts[componentKey]) {
+            oldInsts[componentKey] = [];
           }
 
-          const inst = oldInsts[rawPath].find((i) => i.path === path);
+          const inst = oldInsts[componentKey].find((i) => i.path === path);
           if (!inst) {
-            oldInsts[rawPath].push({
+            oldInsts[componentKey].push({
               path,
               data,
               isOpen: true,
@@ -78,48 +122,38 @@ export const ModalProvider: FC<ModalProviderProps> = ({
         })
       );
     },
-    [routes]
+    [getPathAndKey]
   );
 
   const close = useCallback(
-    (path: string) => {
-      const rawPath = matchPath(routes, path);
-
-      if (!rawPath) {
-        console.error(`no registered modal path matched for ${path}`);
-        return;
-      }
+    (pathOrComponent: string | ComponentType, data: unknown) => {
+      const [path, componentKey] = getPathAndKey(pathOrComponent, data);
 
       setInstances(
         produce((oldInsts) => {
-          if (!oldInsts[rawPath]) {
-            oldInsts[rawPath] = [];
+          if (!oldInsts[componentKey]) {
+            oldInsts[componentKey] = [];
           }
 
-          const inst = oldInsts[rawPath].find((inst) => inst.path === path);
+          const inst = oldInsts[componentKey].find(
+            (inst) => inst.path === path
+          );
           if (!inst) return;
 
           inst.isOpen = false;
         })
       );
     },
-    [routes]
+    [getPathAndKey]
   );
 
   const getComponentInstances = useCallback(
     (Component: ComponentType) => {
-      const modal = modals.find((m) => m[1] === Component);
+      const componentKey = getId(Component);
 
-      if (!modal) {
-        console.error(
-          `Component ${Component.name} is not registered in ModalProvider.`
-        );
-        return [];
-      }
-
-      return instances[modal[0]] ?? [];
+      return instances[componentKey] ?? [];
     },
-    [instances, modals]
+    [instances]
   );
 
   const value = useMemo(
@@ -136,32 +170,17 @@ export const ModalProvider: FC<ModalProviderProps> = ({
   );
 };
 
-function parse(path: string, params?: unknown): string {
-  return path
-    .split("/")
-    .map((p) => {
-      if (!p.startsWith(":")) return p;
-
-      const paramName = p.slice(1);
-
-      return String((params as Record<string, unknown>)?.[paramName]);
-    })
-    .join("/");
-}
-
-export const useModal = (rawPath: string) => {
+export const useModal = (pathOrComponent: string | ComponentType) => {
   const { open: openPath, close: closePath } = useContext(
     ModalContext
   ) as ModalProviderValue;
 
   const open: <T = unknown>(data?: T) => void = (data) => {
-    const parsedPath = parse(rawPath, data);
-    openPath(parsedPath, data);
+    openPath(pathOrComponent, data);
   };
 
   const close: (pathParams?: unknown) => void = (pathParams) => {
-    const parsedPath = parse(rawPath, pathParams);
-    closePath(parsedPath);
+    closePath(pathOrComponent, pathParams);
   };
 
   return {
