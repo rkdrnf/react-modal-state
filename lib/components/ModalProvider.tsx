@@ -54,14 +54,12 @@ type Instance = {
   isOpen: boolean;
 };
 
-function matchPath(routes: string[], path: string): string | null {
-  for (const route of routes) {
-    const regex = route
-      .split("/")
-      .map((seg) => seg.replace(/:.*/, "[^/]+"))
-      .join("\\/");
-
-    if (new RegExp(regex).test(path)) return route;
+function matchPath(
+  routeRegexes: [string, RegExp][],
+  path: string
+): string | null {
+  for (const [route, regex] of routeRegexes) {
+    if (regex.test(path)) return route;
   }
 
   return null;
@@ -73,13 +71,25 @@ export const ModalProvider: FC<ModalProviderProps> = ({
 }) => {
   const [instances, setInstances] = useState<Record<string, Instance[]>>({});
 
-  const routes = useMemo(() => modals.map((m) => m[0]), [modals]);
+  const routeRegexes: [string, RegExp][] = useMemo(
+    () =>
+      modals.map((m) => [
+        m[0],
+        new RegExp(
+          m[0]
+            .split("/")
+            .map((seg) => seg.replace(/:.*/, "[^/]+"))
+            .join("\\/")
+        ),
+      ]),
+    [modals]
+  );
 
   const getPathAndKey = useCallback(
     (pathOrComponent: string | ComponentType, data: unknown) => {
       if (typeof pathOrComponent === "string") {
         const parsedPath = parse(pathOrComponent, data);
-        const rawPath = matchPath(routes, pathOrComponent);
+        const rawPath = matchPath(routeRegexes, pathOrComponent);
         const modal = modals.find((m) => m[0] === rawPath);
 
         if (!modal) {
@@ -95,7 +105,7 @@ export const ModalProvider: FC<ModalProviderProps> = ({
         return [path, getId(pathOrComponent)];
       }
     },
-    [modals, routes]
+    [modals, routeRegexes]
   );
 
   const open = useCallback(
