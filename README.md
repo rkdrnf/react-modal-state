@@ -20,7 +20,7 @@ import { ModalProvider, ModalRenderer } from "react-modal-state";
 
 ...
 
-// Optionally provide modals prop to open modal by id or use self-nested modals
+// Optionally provide modals prop to open modal by id or to use self-nested modals
 <ModalProvider modals={[
         ["users/:id", UserModal],
       ]}
